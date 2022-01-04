@@ -5,11 +5,13 @@ import (
 	"errors"
 	"io"
 	"os"
+	"regexp"
 )
 
 type counter struct {
 	input  io.Reader
 	output io.Writer
+	match  string
 }
 
 /*
@@ -42,6 +44,13 @@ func WithOutput(output io.Writer) option {
 	}
 }
 
+func Match(match string) option {
+	return func(c *counter) error {
+		c.match = match
+		return nil
+	}
+}
+
 func NewCounter(opts ...option) (counter, error) {
 	c := counter{
 		input:  os.Stdin,
@@ -59,11 +68,22 @@ func NewCounter(opts ...option) (counter, error) {
 
 func (c counter) LineCount() int {
 	lines := 0
+	mlines := 0
 	sc := bufio.NewScanner(c.input)
+
 	for sc.Scan() {
 		lines++
+		matched, _ := regexp.MatchString(sc.Text(), c.match)
+		if matched {
+			mlines++
+		}
 	}
-	return lines
+
+	if c.match != "" {
+		return mlines
+	} else {
+		return lines
+	}
 
 }
 
