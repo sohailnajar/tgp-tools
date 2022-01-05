@@ -3,6 +3,7 @@ package linecount
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"regexp"
@@ -30,6 +31,20 @@ func WithInput(input io.Reader) option {
 			return errors.New("nil input reader")
 		}
 		c.input = input
+		return nil
+	}
+}
+
+func WithInputArgs(args []string) option {
+	return func(c *counter) error {
+		if len(args) == 0 {
+			return nil
+		}
+		f, err := os.Open(args[0])
+		if err != nil {
+			return err
+		}
+		c.input = f
 		return nil
 	}
 }
@@ -70,7 +85,6 @@ func (c counter) LineCount() int {
 	lines := 0
 	mlines := 0
 	sc := bufio.NewScanner(c.input)
-
 	for sc.Scan() {
 		lines++
 		matched, _ := regexp.MatchString(sc.Text(), c.match)
@@ -88,9 +102,12 @@ func (c counter) LineCount() int {
 }
 
 func LineCount() int {
-	c, err := NewCounter()
+	c, err := NewCounter(
+		WithInputArgs(os.Args[1:]),
+	)
 	if err != nil {
-		panic("internal error") // panic because user can not fix this error
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 	return c.LineCount()
 }
