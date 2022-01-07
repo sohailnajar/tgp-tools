@@ -12,10 +12,10 @@ func TestPrintSlow(t *testing.T) {
 	inputBuf := bytes.NewBufferString("sohail")
 	want := inputBuf.String()
 
-	c := dramachars.Printer{
-		Input:  inputBuf,
-		Output: fakeTerminal,
-	}
+	c := dramachars.NewPrinter(
+		dramachars.WithInput(inputBuf),
+		dramachars.WithOutput(fakeTerminal),
+	)
 	c.PrintSlow()
 
 	got := fakeTerminal.String()
