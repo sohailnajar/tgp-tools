@@ -2,9 +2,15 @@ package main
 
 import (
 	"dramachars"
+	"os"
+	"time"
 )
 
 func main() {
-	sp := dramachars.NewPrinter()
-	sp.PrintSlow()
+	np, _ := dramachars.NewPrinter(
+		dramachars.WithInputArgs(os.Args[1:]),
+		dramachars.WithDelay(time.Second*2),
+	)
+	np.PrintSlow()
+
 }

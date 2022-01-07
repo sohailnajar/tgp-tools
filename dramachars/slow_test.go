@@ -12,7 +12,7 @@ func TestPrintSlow(t *testing.T) {
 	inputBuf := bytes.NewBufferString("sohail")
 	want := inputBuf.String()
 
-	c := dramachars.NewPrinter(
+	c, _ := dramachars.NewPrinter(
 		dramachars.WithInput(inputBuf),
 		dramachars.WithOutput(fakeTerminal),
 	)
@@ -23,4 +23,22 @@ func TestPrintSlow(t *testing.T) {
 		t.Errorf("want %q, got %q", want, got)
 	}
 
+}
+
+func TestWithEmptyInputArgs(t *testing.T) {
+	t.Parallel()
+	fakeTerminal := &bytes.Buffer{}
+	inputBuf := bytes.NewBufferString("wake up neo!")
+	want := inputBuf.String()
+
+	p, _ := dramachars.NewPrinter(
+		dramachars.WithInput(inputBuf),
+		dramachars.WithOutput(fakeTerminal),
+		dramachars.WithInputArgs([]string{}),
+	)
+	p.PrintSlow()
+	got := fakeTerminal.String()
+	if want != got {
+		t.Errorf("want %q, got %q", want, got)
+	}
 }
