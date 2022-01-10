@@ -6,6 +6,22 @@ import (
 	"testing"
 )
 
+func TestWords(t *testing.T) {
+	t.Parallel()
+	inputBuf := bytes.NewBufferString("hello\nmy\nname\nis jack")
+	c, err := linecount.NewCounter(
+		linecount.WithInput(inputBuf),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := 5
+	got := c.Words()
+	if want != got {
+		t.Errorf("want %d, got %d", want, got)
+	}
+
+}
 func TestLines(t *testing.T) {
 	t.Parallel()
 	matchStr := "hello\nis"

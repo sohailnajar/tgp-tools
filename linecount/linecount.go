@@ -111,3 +111,24 @@ func LineCount() int {
 	}
 	return c.LineCount()
 }
+
+func (c counter) Words() int {
+	words := 0
+	scanner := bufio.NewScanner(c.input)
+	scanner.Split(bufio.ScanWords)
+	for scanner.Scan() {
+		words++
+	}
+	return words
+}
+
+func Words() int {
+	c, err := NewCounter(
+		WithInputArgs(os.Args[1:]),
+	)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	return c.Words()
+}
