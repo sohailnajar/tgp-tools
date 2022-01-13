@@ -3,6 +3,7 @@ package linecount
 import (
 	"bufio"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -10,9 +11,10 @@ import (
 )
 
 type counter struct {
-	input  io.Reader
-	output io.Writer
-	match  string
+	input     io.Reader
+	output    io.Writer
+	match     string
+	wordCount bool
 }
 
 /*
@@ -35,11 +37,25 @@ func WithInput(input io.Reader) option {
 	}
 }
 
-func WithInputArgs(args []string) option {
+func WithArgs(args []string) option {
 	return func(c *counter) error {
-		if len(args) == 0 {
+		// see whats passed at cmd
+		fset := flag.NewFlagSet(os.Args[0],
+			flag.ContinueOnError)
+		wordCount := fset.Bool("w", false,
+			"Count words instead of lines")
+		fset.SetOutput(c.output)
+		err := fset.Parse(args)
+		if err != nil {
+			return err
+		}
+		c.wordCount = *wordCount
+		// get non-flag arguments
+		args = fset.Args()
+		if len(args) < 1 {
 			return nil
 		}
+		// args[0] is first non flag argument
 		f, err := os.Open(args[0])
 		if err != nil {
 			return err
@@ -101,9 +117,10 @@ func (c counter) LineCount() int {
 
 }
 
+// Wrapper
 func LineCount() int {
 	c, err := NewCounter(
-		WithInputArgs(os.Args[1:]),
+		WithArgs(os.Args[1:]),
 	)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -122,13 +139,30 @@ func (c counter) Words() int {
 	return words
 }
 
+// Wrapper
 func Words() int {
 	c, err := NewCounter(
-		WithInputArgs(os.Args[1:]),
+		WithArgs(os.Args[1:]),
 	)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 	return c.Words()
+}
+
+func RunCli() {
+	c, err := NewCounter(
+		WithArgs(os.Args[1:]),
+	)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	if c.wordCount {
+		fmt.Println(c.Words())
+	} else {
+		fmt.Println(c.LineCount())
+	}
+
 }
