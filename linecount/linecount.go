@@ -15,6 +15,7 @@ type counter struct {
 	output    io.Writer
 	match     string
 	wordCount bool
+	verbosity bool
 }
 
 /*
@@ -44,12 +45,14 @@ func WithArgs(args []string) option {
 			flag.ContinueOnError)
 		wordCount := fset.Bool("w", false,
 			"Count words instead of lines")
+		verbosity := fset.Bool("v", false, "Show verbose count")
 		fset.SetOutput(c.output)
 		err := fset.Parse(args)
 		if err != nil {
 			return err
 		}
 		c.wordCount = *wordCount
+		c.verbosity = *verbosity
 		// get non-flag arguments
 		args = fset.Args()
 		if len(args) < 1 {

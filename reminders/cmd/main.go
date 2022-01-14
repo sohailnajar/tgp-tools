@@ -7,9 +7,10 @@ import (
 
 func main() {
 	r, _ := reminders.NewReminder()
-	if os.Args == nil {
-		r.PrintReminders()
+	if len(os.Args) > 1 {
+		r.SaveReminders(os.Args[1:])
+	} else {
+		reminders.PrintReminders()
 	}
-	r.AddReminder(os.Args[1:])
 
 }

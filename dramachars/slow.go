@@ -59,6 +59,8 @@ func WithOutput(output io.Writer) option {
 	}
 }
 
+// args are accepted as []string,
+// for ease of testing
 func WithInputArgs(args []string) option {
 	return func(p *printer) error {
 		if len(args) == 0 {
