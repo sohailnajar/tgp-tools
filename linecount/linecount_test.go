@@ -75,6 +75,22 @@ func TestWordCount(t *testing.T) {
 	}
 }
 
+func TestBytesCount(t *testing.T) {
+	t.Parallel()
+	inputBuf := bytes.NewBufferString("123")
+	c, err := linecount.NewCounter(
+		linecount.WithInput(inputBuf),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := 3
+	got := c.BytesCount()
+	if want != got {
+		t.Errorf("want %q, got %q", want, got)
+	}
+}
+
 func TestBogusFlags(t *testing.T) {
 	t.Parallel()
 	args := []string{"-bogus"}

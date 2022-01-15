@@ -15,7 +15,7 @@ type counter struct {
 	output    io.Writer
 	match     string
 	wordCount bool
-	verbosity bool
+	byteCount bool
 }
 
 /*
@@ -45,14 +45,14 @@ func WithArgs(args []string) option {
 			flag.ContinueOnError)
 		wordCount := fset.Bool("w", false,
 			"Count words instead of lines")
-		verbosity := fset.Bool("v", false, "Show verbose count")
+		byteCount := fset.Bool("b", false, "Show byte count")
 		fset.SetOutput(c.output)
 		err := fset.Parse(args)
 		if err != nil {
 			return err
 		}
 		c.wordCount = *wordCount
-		c.verbosity = *verbosity
+		c.byteCount = *byteCount
 		// get non-flag arguments
 		args = fset.Args()
 		if len(args) < 1 {
@@ -142,6 +142,16 @@ func (c counter) Words() int {
 	return words
 }
 
+func (c counter) BytesCount() int {
+	bytesc := 0
+	scanner := bufio.NewScanner(c.input)
+	scanner.Split(bufio.ScanBytes)
+	for scanner.Scan() {
+		bytesc++
+	}
+	return bytesc
+}
+
 // Wrapper
 func Words() int {
 	c, err := NewCounter(
@@ -162,8 +172,14 @@ func RunCli() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+	if c.wordCount && c.byteCount {
+		fmt.Println("Error: can not use multiple flag!")
+		os.Exit(1)
+	}
 	if c.wordCount {
 		fmt.Println(c.Words())
+	} else if c.byteCount {
+		fmt.Println(c.BytesCount())
 	} else {
 		fmt.Println(c.LineCount())
 	}
