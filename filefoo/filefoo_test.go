@@ -104,3 +104,10 @@ func TestWriteZeros(t *testing.T) {
 		t.Errorf("wanted size 10, got :%d", size)
 	}
 }
+
+func BenchmarkWriteZeros(b *testing.B) {
+	path := b.TempDir() + "/zeros_file.txt"
+	for i := 0; i < b.N; i++ {
+		filefoo.BufferdWrite(path, 1000)
+	}
+}
