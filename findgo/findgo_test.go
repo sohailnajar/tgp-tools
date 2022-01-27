@@ -1,0 +1,15 @@
+package findgo_test
+
+import (
+	"findgo"
+	"testing"
+)
+
+func TestFiles(t *testing.T) {
+	t.Parallel()
+	want := 4
+	got := findgo.Files("testdata")
+	if want != got {
+		t.Errorf("want %d, got %d", want, got)
+	}
+}
