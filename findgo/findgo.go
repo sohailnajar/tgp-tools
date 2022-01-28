@@ -2,12 +2,10 @@ package findgo
 
 import (
 	"io/fs"
-	"os"
 	"path/filepath"
 )
 
-func Files(path string) (count int) {
-	fsys := os.DirFS(path)
+func Files(fsys fs.FS) (count int) {
 	fs.WalkDir(fsys, ".", func(p string, d fs.DirEntry, err error) error {
 		if filepath.Ext(p) == ".go" {
 			count++
@@ -16,5 +14,5 @@ func Files(path string) (count int) {
 
 	})
 
-	return count
+	return
 }
